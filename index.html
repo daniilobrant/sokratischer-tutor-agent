@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sokratischer Tutor · Lerncockpit</title>
+<style>
+:root{color-scheme:light;--ink:#182c33;--petrol:#24666a;--soft:#dcefe1;--line:#d3dedb}
+*{box-sizing:border-box}body{margin:0;font:16px/1.55 system-ui,sans-serif;background:#f7f7f5;color:var(--ink)}
+main{max-width:1050px;margin:auto;padding:40px 24px 80px}h1{font-size:clamp(2.2rem,6vw,4rem);line-height:1.1;margin:.4rem 0}h2{margin-top:0}
+.eyebrow{color:var(--petrol);font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.lead{max-width:740px;color:#465d60}.notice{background:var(--soft);border-radius:16px;padding:18px 22px;margin:26px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:white;border:1px solid var(--line);padding:24px;border-radius:18px}
+.wide{grid-column:1/-1}label{display:block;font-weight:650;margin:14px 0 5px}input,select,textarea,button{font:inherit}
+input:not([type=file]),select,textarea{width:100%;border:1px solid #b8cac5;border-radius:8px;padding:10px;background:white}
+button{background:var(--petrol);color:white;border:0;border-radius:8px;padding:11px 16px;margin-top:12px;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #c49c3a;outline-offset:3px}
+ul{padding-left:20px}li{margin:8px 0}.muted{color:#536b6d;font-size:.9rem}.result{white-space:pre-wrap;overflow-wrap:anywhere}.status{min-height:1.5em;color:#24666a}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}main{padding:28px 16px}}
+</style></head>
+<body><main>
+<div class="eyebrow">Deine Lernwerkstatt · Codex</div>
+<h1>Verstehen statt<br>auswendig lernen.</h1>
+<p class="lead">Importiere Unterlagen, finde passende Stellen und halte deinen Lernstand fest. Die eigentliche Unterhaltung und die Verständnisfragen laufen in Codex.</p>
+<div class="notice" id="modeNotice"><strong>So lernst du:</strong> Importiere eine Datei, öffne den Tutor-Ordner in Codex und schreibe dort: „Nutze meinen sokratischen Tutor. Hilf mir, [Thema] zu verstehen.“ Der Tutor sucht in deinen Quellen und nennt die passende Stelle.</div>
+<div class="grid">
+<section class="card"><h2>1 · Unterlagen importieren</h2><p class="muted">Markdown, Text oder JSON bis 2 MB. Deine Dateien werden lokal in der Tutor-Datenbank gespeichert.</p>
+<label for="file">Datei auswählen</label><input id="file" type="file" accept=".md,.txt,.json">
+<button id="import" type="button">Datei importieren</button><p id="importStatus" class="status" role="status"></p>
+<h3>Deine Quellen</h3><ul id="documents"></ul></section>
+<section class="card"><h2>2 · Quellen durchsuchen</h2><label for="query">Thema oder Suchbegriffe</label><input id="query" placeholder="z. B. Prompt Engineering">
+<button id="search" type="button">Stellen finden</button><p id="searchStatus" class="status" role="status"></p><div id="results"></div></section>
+<section class="card wide"><h2>3 · Lernstand festhalten</h2><p class="muted">Trage selbst ein, was du weiter üben möchtest oder schon sicher beherrschst.</p>
+<label for="topic">Thema</label><input id="topic" placeholder="z. B. RAG">
+<label for="level">Stand</label><select id="level"><option value="üben">Weiter üben</option><option value="sicher">Sicher</option></select>
+<label for="note">Notiz (optional)</label><textarea id="note" rows="2"></textarea><button id="save" type="button">Lernstand speichern</button>
+<p id="saveStatus" class="status" role="status"></p><ul id="progress"></ul></section>
+<section class="card wide"><h2>Beispiele zum Üben</h2><p>Was unterscheidet RAG von einem Modell, das nur aus seinem Gedächtnis antwortet? Wann würdest du ein Werkzeug statt einer Schätzung verwenden? Wie könntest du eine KI-Antwort überprüfen?</p><h2>Beispiel für Codex</h2><p>„Ich lerne für KI &amp; Data Science. Suche in meinen Unterlagen nach RAG und stelle mir zuerst eine Verständnisfrage. Gib mir Hinweise, bevor du die Lösung erklärst.“</p><p class="muted">Dieses Cockpit verwendet selbst kein KI-Modell. Es speichert und durchsucht Unterlagen lokal; Codex übernimmt die Unterhaltung.</p></section>
+</div></main>
+<script>
+const $ = id => document.getElementById(id);
+const localServer = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') && location.protocol === 'http:';
+const browserKey = 'sokratischer-tutor-demo-v1';
+if (!localServer) {
+  $('modeNotice').textContent = 'Online-Demo: Import und Suche laufen nur in diesem Browser. Für echte Codex-Gespräche öffne das Projekt lokal und importiere deine Unterlagen dort erneut. Browserdaten und lokaler Tutor werden nicht automatisch synchronisiert.';
+}
+async function api(path, data) {
+  if (!localServer) {
+    const state = JSON.parse(localStorage.getItem(browserKey) || '{"documents":[],"progress":[]}');
+    if (path === '/api/documents') return state.documents.map(({id,title,created_at}) => ({id,title,created_at}));
+    if (path === '/api/progress') return state.progress;
+    if (path === '/api/import') {
+      if (!/\.(md|txt|json)$/i.test(data.title) || !data.body.trim()) throw new Error('Bitte eine nicht leere .md-, .txt- oder .json-Datei auswählen.');
+      if (/\.json$/i.test(data.title)) { try { JSON.parse(data.body); } catch { throw new Error('Die JSON-Datei ist ungültig.'); } }
+      const doc = {id:Date.now(),title:data.title,body:data.body,created_at:new Date().toISOString()};
+      state.documents.unshift(doc);
+      localStorage.setItem(browserKey, JSON.stringify(state));
+      return {id:doc.id,title:doc.title};
+    }
+    if (path === '/api/search') {
+      const words = [...new Set(data.query.toLocaleLowerCase().match(/[\p{L}\p{N}_]+/gu) || [])];
+      if (!words.length) throw new Error('Bitte Suchbegriffe eingeben.');
+      const rows = [];
+      for (const doc of state.documents) doc.body.split(/\r?\n/).forEach((line,i) => {
+        const score=words.filter(w => line.toLocaleLowerCase().includes(w)).length;
+        if(score) rows.push({document:doc.title,line:i+1,text:line.slice(0,600),score});
+      });
+      return rows.sort((a,b) => b.score-a.score).slice(0,8);
+    }
+    if (path === '/api/record') {
+      if (!data.topic.trim()) throw new Error('Bitte ein Thema eingeben.');
+      state.progress.unshift({topic:data.topic.trim(),status:data.status,note:data.note,created_at:new Date().toISOString()});
+      localStorage.setItem(browserKey,JSON.stringify(state)); return {topic:data.topic};
+    }
+    throw new Error('Unbekannte Anfrage.');
+  }
+  const options = data === undefined ? {} : {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)};
+  const response = await fetch(path, options);
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || 'Anfrage fehlgeschlagen');
+  return result;
+}
+function renderList(id, items, formatter) {
+  const root = $(id); root.replaceChildren();
+  if (!items.length) { const li=document.createElement('li'); li.textContent='Noch keine Einträge.'; root.append(li); return; }
+  for (const item of items) { const li=document.createElement('li'); li.textContent=formatter(item); root.append(li); }
+}
+async function refresh() {
+  renderList('documents', await api('/api/documents'), d => d.title + ' · Quelle #' + d.id);
+  renderList('progress', await api('/api/progress'), p => p.topic + ' · ' + p.status + (p.note ? ' · ' + p.note : ''));
+}
+$('import').onclick = async () => {
+  try {
+    const f=$('file').files[0]; if(!f) throw new Error('Bitte zuerst eine Datei auswählen.');
+    if(f.size>2000000) throw new Error('Datei ist größer als 2 MB.');
+    const result=await api('/api/import',{title:f.name,body:await f.text()});
+    $('importStatus').textContent='Importiert: '+result.title; $('file').value=''; await refresh();
+  } catch(e){$('importStatus').textContent=e.message;}
+};
+$('search').onclick = async () => {
+  try {
+    const rows=await api('/api/search',{query:$('query').value}); $('results').replaceChildren();
+    $('searchStatus').textContent=rows.length ? rows.length+' passende Stellen:' : 'Keine passenden Stellen gefunden.';
+    for(const r of rows){const p=document.createElement('p');p.className='result';p.textContent=r.document+' · Zeile '+r.line+'\n'+r.text;$('results').append(p);}
+  } catch(e){$('searchStatus').textContent=e.message;}
+};
+$('save').onclick = async () => {
+  try {await api('/api/record',{topic:$('topic').value,status:$('level').value,note:$('note').value});$('saveStatus').textContent='Lernstand gespeichert.';$('topic').value='';$('note').value='';await refresh();}
+  catch(e){$('saveStatus').textContent=e.message;}
+};
+refresh().catch(()=>{$('importStatus').textContent='Der lokale Tutor-Server ist nicht erreichbar. Bitte über die Startanleitung starten.';});
+</script></body></html>
