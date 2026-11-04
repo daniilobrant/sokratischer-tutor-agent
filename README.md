@@ -1,63 +1,59 @@
-# Sokratischer Tutor für Codex
+# Sokratischer Lern- und Klausurtutor
 
 [🇩🇪 Deutsch](#-deutsch) | [🇬🇧 English](#-english)
 
-**[Live-Demo / Live demo](https://daniilobrant.github.io/sokratischer-tutor-agent/)**
-
 ## 🇩🇪 Deutsch
 
-Ein Lernbegleiter, der Vorlesungsstoff mithilfe von Codex, Fragen und nachvollziehbaren Quellen erschließt.
+Ein Lerncockpit für Vorlesungen und Prüfungen: Wähle ein Fach, bereite eine Frage vor, durchsuche Unterlagen und lerne mit sokratischen Rückfragen in Codex. Die öffentliche Seite ist eine Browser-Demo; ein tatsächliches Tutorengespräch findet in Codex statt.
 
 ### Funktionen
 
-- Markdown-, Text- und JSON-Dateien bis 2 MB importieren und nach Textstellen mit Zeilennummer suchen.
-- Themen und Lernstand festhalten; Codex stellt Verständnisfragen und gibt Hinweise.
-- Die öffentliche Demo speichert Daten im Browser. Für ein echtes Tutorengespräch das Projekt lokal in Codex öffnen.
+- Lernbereiche für verschiedene Fächer anlegen und beim Speichern von Lernständen kennzeichnen.
+- Fragen mit den Erklärstufen einfach, normal und fachlich vorbereiten; Hinweise und Übungsfragen für Codex anfordern.
+- Text-, Markdown- und JSON-Unterlagen importieren und mit Fundstellen durchsuchen.
+- Lernstand und Notizen festhalten; helles oder dunkles Design wählen.
+
+### Schnellstart
+
+1. Python 3 installieren und diesen Projektordner in Codex öffnen.
+2. Im Terminal `python3 tutor_tools.py serve` ausführen und die angezeigte lokale Adresse öffnen.
+3. Ein Fach anlegen, bei Bedarf Unterlagen importieren und eine Frage mit Erklärstufe vorbereiten.
+4. Die Anfrage kopieren und in Codex einfügen. Für Rückfragen und Übungen die entsprechenden Schaltflächen nutzen.
+
+Die Online-Demo speichert Quellen und Lernstand im Browser; der lokale Server nutzt eine separate SQLite-Datenbank. Die beiden Speicher synchronisieren sich nicht. Die Fachauswahl und das Design werden im jeweiligen Browser gespeichert. Alle Quellen werden gemeinsam durchsucht; die Fachauswahl filtert keine Dokumente automatisch. Lernstände werden durch das vorangestellte Fach gekennzeichnet.
 
 ### Architektur und Datenschutz
 
-Codex führt den Dialog. Ein Python-Werkzeug verwaltet Quellen und Lernstand lokal in SQLite; die Suche ist regelbasiert und verwendet kein Sprachmodell. Das lokale Cockpit verwendet einen Python-Server auf 127.0.0.1. GitHub Pages stellt eine eigenständige Browser-Demo mit localStorage bereit. **Beide Speicher sind getrennt** und werden nicht automatisch synchronisiert. Importierte Texte sind Daten, keine Anweisungen. Es sind keine API-Schlüssel eingebettet; für Codex gelten deine Zugangsvoraussetzungen und Nutzungsgrenzen.
+Die Suche ist regelbasiert und erfolgt lokal. Codex übernimmt die KI-Unterhaltung und unterliegt den jeweiligen Nutzungs- und Datenschutzeinstellungen; dabei können an Codex übermittelte Inhalte an dessen Dienst übertragen werden. Es werden keine API-Schlüssel in die Seite eingebettet. Ein Modellumschalter oder eine direkte Chat-Verbindung zu Codex in der Website ist nicht implementiert.
 
-### Lokal starten
+### Dateien und Herkunft
 
-1. Repository herunterladen und den Ordner in Codex öffnen.
-2. Im Ordner den folgenden Befehl ausführen und http://127.0.0.1:8765/ öffnen:
-
-       python3 tutor_tools.py serve
-
-3. Unterlagen importieren und Codex bitten: „Hilf mir, dieses Thema mit Fragen zu verstehen.“
-
-Alternativ Dateien mit dem Befehl python3 tutor_tools.py import gefolgt vom Dateipfad importieren. PDF- und Word-Dokumente vorher als Text exportieren. Python 3 ist erforderlich; zusätzliche Python-Pakete sind nicht nötig. Die Pages-Demo ist eine Website, keine installierbare PWA und kein Server für Codex.
-
-### Daten, Lizenz und Quellen
-
-Die lokale Datei data/tutor.sqlite3 ist von Git ausgeschlossen und enthält importierte Dokumente und Lernstände. Eine automatische Sicherung oder geräteübergreifende Synchronisierung gibt es nicht. Für dieses Projekt ist keine separate Lizenz angegeben. Entstanden im Rahmen der Vorlesung „Data Science & KI“ bei Prof. Dr. Mathias Engel; [Kursmaterial](https://github.com/ProfEngel/KI-Literacy) und [Trinity-Referenz](https://profengel.github.io/KI-Literacy/trinity-agenten.html).
+`index.html` enthält das Lerncockpit, `tutor_tools.py` den lokalen Server und die Suche, `role.yaml`, `AGENTS.md`, `workflow.json` und `output.schema.json` beschreiben Rolle und Ablauf. Das Projekt entstand im Rahmen der Vorlesung „Data Science & KI“ bei Prof. Dr. Mathias Engel. Die Organisation des Lernablaufs wurde von [Leonie Trobl Gomez’ Tutor](https://github.com/LeonieTroblGomez/sokratischer-tutor-agent) inspiriert; die Umsetzung basiert auf dem bestehenden Tutor dieses Projekts. Für dieses Projekt ist keine separate Lizenz angegeben.
 
 ## 🇬🇧 English
 
-A study companion that uses Codex, questions and traceable source passages to explore course material.
+A study dashboard for courses and exams: choose a subject, prepare a question, search your materials, and learn through Socratic questions in Codex. The public page is a browser demo; an actual tutoring conversation takes place in Codex.
 
 ### Features
 
-- Import Markdown, text and JSON files up to 2 MB and search for passages with line numbers.
-- Record topics and learning progress; Codex asks questions and provides hints.
-- The public demo stores data in your browser. Open the project locally in Codex for an actual tutoring conversation.
+- Create subject areas and label saved learning progress by subject.
+- Prepare questions at simple, standard or advanced explanation levels and request hints or exercises for Codex.
+- Import and search text, Markdown and JSON learning materials with line references.
+- Record progress and notes; choose light or dark appearance.
+
+### Getting started
+
+1. Install Python 3 and open this project folder in Codex.
+2. Run `python3 tutor_tools.py serve` in a terminal and open the displayed local address.
+3. Create a subject, optionally import materials, and prepare a question and explanation level.
+4. Copy the prompt into Codex. Use the follow-up buttons to request hints or practice.
+
+The online demo keeps sources and progress in the browser; the local server uses a separate SQLite database. These stores do not sync. Subject selection and theme are saved in each browser. Search covers all imported sources; selecting a subject does not filter documents. Progress entries are labelled with the selected subject.
 
 ### Architecture and privacy
 
-Codex handles the conversation. A Python tool manages sources and progress locally in SQLite; search is deterministic and does not use a language model. The local cockpit uses a Python server bound to 127.0.0.1. GitHub Pages serves a separate browser demo using localStorage. **The two stores are separate** and do not sync automatically. Imported text is treated as data, not instructions. No API keys are embedded; Codex access is subject to applicable terms and limits.
+Search uses deterministic local rules. Codex handles the AI conversation and is subject to its own terms and privacy settings; content sent to Codex may be transmitted to its service. No API keys are embedded in the page. A model switcher and a direct website-to-Codex chat connection are not implemented.
 
-### Quick start
+### Files and attribution
 
-1. Download the repository and open its folder in Codex.
-2. Run the following command in the folder and open http://127.0.0.1:8765/:
-
-       python3 tutor_tools.py serve
-
-3. Import your material and ask Codex to guide you through a topic with questions.
-
-Alternatively import a file using python3 tutor_tools.py import followed by its path. Export PDF and Word files to text first. Python 3 is required; no additional Python packages are needed. The Pages demo is a website, not an installable PWA or a Codex server.
-
-### Data, license and sources
-
-The local data/tutor.sqlite3 database is excluded from Git and contains imported documents and progress. There is no automatic backup or cross-device sync. No separate license has been specified for this project. Created as coursework for “Data Science & AI” with Prof. Dr. Mathias Engel; [course materials](https://github.com/ProfEngel/KI-Literacy) and [Trinity reference](https://profengel.github.io/KI-Literacy/trinity-agenten.html).
+`index.html` contains the dashboard, `tutor_tools.py` the local server and search, and `role.yaml`, `AGENTS.md`, `workflow.json` and `output.schema.json` describe the role and workflow. Created for the “Data Science & AI” course taught by Prof. Dr. Mathias Engel. The learning workflow was inspired by [Leonie Trobl Gomez’s tutor](https://github.com/LeonieTroblGomez/sokratischer-tutor-agent); the implementation builds on this project's existing tutor. No separate project license is specified.
