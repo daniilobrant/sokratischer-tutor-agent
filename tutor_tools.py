@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 DB = ROOT / "data" / "tutor.sqlite3"
 MAX_BYTES = 2_000_000
-VALID_STATUS = ("üben", "sicher")
+VALID_STATUS = ("üben", "sicher", "unsicher")
 
 def connect():
     DB.parent.mkdir(parents=True, exist_ok=True)
