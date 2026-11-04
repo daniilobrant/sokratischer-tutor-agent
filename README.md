@@ -13,6 +13,20 @@ Ein Lerncockpit für Vorlesungen und Prüfungen: Wähle ein Fach, bereite eine F
 - Text-, Markdown- und JSON-Unterlagen importieren und mit Fundstellen durchsuchen.
 - Lernstand und Notizen festhalten; helles oder dunkles Design wählen.
 
+### So benutzt du den Tutor
+
+1. Öffne die [Tutor-Seite](https://daniilobrant.github.io/sokratischer-tutor-agent/) und wähle ein Fach oder ergänze ein neues.
+
+   ![Startseite mit Lernbereich](screenshots/01-start.jpg)
+
+2. Gib unter **Frage an deinen Tutor** deine Frage ein und wähle eine Erklärstufe. Klicke auf **Anfrage erstellen** und dann auf **Für Codex kopieren**. Füge die Anfrage in Codex ein. Mit **Noch nicht verstanden** oder **Übungsfrage erstellen** bereitest du eine Anschlussfrage vor.
+
+   ![Beispielfrage und vorbereitete Codex-Anfrage](screenshots/02-frage.jpg)
+
+3. Wähle bei **Unterlagen importieren** eine `.txt`-, `.md`- oder `.json`-Datei und klicke auf **Datei importieren**. Unter **Quellen durchsuchen** findest du Textstellen; unter **Lernstand festhalten** speicherst du dein Thema, deinen Stand und optional eine Notiz.
+
+   ![Quellensuche und Lernstand](screenshots/03-quellen.jpg)
+
 ### Schnellstart
 
 1. Python 3 installieren und diesen Projektordner in Codex öffnen.
@@ -40,6 +54,22 @@ A study dashboard for courses and exams: choose a subject, prepare a question, s
 - Prepare questions at simple, standard or advanced explanation levels and request hints or exercises for Codex.
 - Import and search text, Markdown and JSON learning materials with line references.
 - Record progress and notes; choose light or dark appearance.
+
+### How to use the tutor
+
+1. Open the [tutor page](https://daniilobrant.github.io/sokratischer-tutor-agent/) and select or create a subject.
+
+   ![Home page and subject selection](screenshots/01-start.jpg)
+
+2. Enter your question under **Frage an deinen Tutor** and select an explanation level. Click **Anfrage erstellen** to prepare the prompt, then **Für Codex kopieren** to copy it into Codex. Use **Noch nicht verstanden** for a hint or **Übungsfrage erstellen** for a practice question.
+
+   ![Example question and prepared Codex prompt](screenshots/02-frage.jpg)
+
+3. Under **Unterlagen importieren**, select a `.txt`, `.md` or `.json` file and click **Datei importieren**. Search for passages under **Quellen durchsuchen** and save your topic, status and optional note under **Lernstand festhalten**.
+
+   ![Source search and learning progress](screenshots/03-quellen.jpg)
+
+The website interface is currently in German; these instructions explain its controls in English.
 
 ### Getting started
 
