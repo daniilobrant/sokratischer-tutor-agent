@@ -4,34 +4,36 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Sokratischer Tutor · Lerncockpit</title>
 <style>
-:root{color-scheme:light;--ink:#182c33;--petrol:#24666a;--soft:#dcefe1;--line:#d3dedb}
-*{box-sizing:border-box}body{margin:0;font:16px/1.55 system-ui,sans-serif;background:#f7f7f5;color:var(--ink)}
+:root{color-scheme:light;--ink:#302823;--petrol:#765a46;--soft:#f0e5d9;--line:#ded1c4}
+*{box-sizing:border-box}body{margin:0;font:16px/1.55 system-ui,sans-serif;background:#f8f4ee;color:var(--ink)}
 main{max-width:1050px;margin:auto;padding:40px 24px 80px}h1{font-size:clamp(2.2rem,6vw,4rem);line-height:1.1;margin:.4rem 0}h2{margin-top:0}
 .eyebrow{color:var(--petrol);font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
 .lead{max-width:740px;color:#465d60}.notice{background:var(--soft);border-radius:16px;padding:18px 22px;margin:26px 0}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:white;border:1px solid var(--line);padding:24px;border-radius:18px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:#fffdfa;border:1px solid var(--line);padding:24px;border-radius:18px;box-shadow:0 8px 24px #5339230a}
 .wide{grid-column:1/-1}label{display:block;font-weight:650;margin:14px 0 5px}input,select,textarea,button{font:inherit}
 input:not([type=file]),select,textarea{width:100%;border:1px solid #b8cac5;border-radius:8px;padding:10px;background:white}
 button{background:var(--petrol);color:white;border:0;border-radius:8px;padding:11px 16px;margin-top:12px;cursor:pointer}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #c49c3a;outline-offset:3px}
 ul{padding-left:20px}li{margin:8px 0}.muted{color:#536b6d;font-size:.9rem}.result{white-space:pre-wrap;overflow-wrap:anywhere}.status{min-height:1.5em;color:#24666a}
-@media(max-width:700px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}main{padding:28px 16px}}
+.toolbar{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.toolbar>div{flex:1;min-width:170px}.secondary{background:transparent;color:var(--ink);border:1px solid var(--line)}.answer-box{background:var(--soft);border-radius:12px;padding:16px;white-space:pre-wrap;overflow-wrap:anywhere}.steps{display:flex;gap:8px;flex-wrap:wrap}.steps button{flex:1;min-width:120px}.dark{--ink:#f1e9df;--petrol:#d9b897;--soft:#352e29;--line:#594b40;background:#1c1917;color:var(--ink)}.dark .card{background:#28221e}.dark input:not([type=file]),.dark select,.dark textarea{background:#332b26;color:#f1e9df;border-color:#66564a}.dark button:not(.secondary){background:#d9b897;color:#241b16}.dark .lead,.dark .muted{color:#d3c4b6}@media(max-width:700px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}main{padding:28px 16px}}
 </style></head>
 <body><main>
-<div class="eyebrow">Deine Lernwerkstatt · Codex</div>
+<button id="theme" class="secondary" type="button" aria-pressed="false">☾ Dunkelmodus</button><div class="eyebrow">Deine Lernwerkstatt · Codex</div>
 <h1>Verstehen statt<br>auswendig lernen.</h1>
 <p class="lead">Importiere Unterlagen, finde passende Stellen und halte deinen Lernstand fest. Die eigentliche Unterhaltung und die Verständnisfragen laufen in Codex.</p>
 <div class="notice" id="modeNotice"><strong>So lernst du:</strong> Importiere eine Datei, öffne den Tutor-Ordner in Codex und schreibe dort: „Nutze meinen sokratischen Tutor. Hilf mir, [Thema] zu verstehen.“ Der Tutor sucht in deinen Quellen und nennt die passende Stelle.</div>
 <div class="grid">
+<section class="card wide"><h2>Dein Lernbereich</h2><p class="muted">Lege für jedes Fach einen Lernbereich an. Deine Auswahl und deine Lernnotizen bleiben auf diesem Gerät.</p><div class="toolbar"><div><label for="subject">Fach auswählen</label><select id="subject"></select></div><div><label for="newSubject">Neues Fach</label><input id="newSubject" placeholder="z. B. KI & Data Science"></div><button type="button" id="addSubject">Fach hinzufügen</button></div></section>
+<section class="card wide"><h2>Frage an deinen Tutor</h2><p class="muted">Erstelle eine passende Anfrage und sende sie in Codex. Die Website selbst führt kein KI-Gespräch.</p><label for="question">Was möchtest du verstehen?</label><textarea id="question" rows="3" placeholder="z. B. Was unterscheidet ein Sprachmodell von einem KI-Agenten?"></textarea><label for="difficulty">Erklärstufe</label><select id="difficulty"><option>Einfach</option><option selected>Normal</option><option>Fachlich</option></select><div class="steps"><button type="button" id="prepare">Anfrage erstellen</button><button type="button" class="secondary" id="hint">Noch nicht verstanden</button><button type="button" class="secondary" id="exercise">Übungsfrage erstellen</button><button type="button" class="secondary" id="copyPrompt">Für Codex kopieren</button></div><p id="promptStatus" class="status" role="status"></p><div id="promptOutput" class="answer-box" aria-live="polite">Deine vorbereitete Anfrage erscheint hier.</div></section>
 <section class="card"><h2>1 · Unterlagen importieren</h2><p class="muted">Markdown, Text oder JSON bis 2 MB. Lokal gestartet: Speicherung in der Tutor-Datenbank. Online-Demo: Speicherung in diesem Browser.</p>
 <label for="file">Datei auswählen</label><input id="file" type="file" accept=".md,.txt,.json">
 <button id="import" type="button">Datei importieren</button><p id="importStatus" class="status" role="status"></p>
 <h3>Deine Quellen</h3><ul id="documents"></ul></section>
 <section class="card"><h2>2 · Quellen durchsuchen</h2><label for="query">Thema oder Suchbegriffe</label><input id="query" placeholder="z. B. Prompt Engineering">
 <button id="search" type="button">Stellen finden</button><p id="searchStatus" class="status" role="status"></p><div id="results"></div></section>
-<section class="card wide"><h2>3 · Lernstand festhalten</h2><p class="muted">Trage selbst ein, was du weiter üben möchtest oder schon sicher beherrschst.</p>
+<section class="card wide"><h2>3 · Lernstand festhalten</h2><p class="muted">Die gespeicherten Einträge sind mit dem ausgewählten Fach gekennzeichnet.</p><p class="muted">Trage selbst ein, was du weiter üben möchtest oder schon sicher beherrschst.</p>
 <label for="topic">Thema</label><input id="topic" placeholder="z. B. RAG">
-<label for="level">Stand</label><select id="level"><option value="üben">Weiter üben</option><option value="sicher">Sicher</option></select>
+<label for="level">Stand</label><select id="level"><option value="üben">Weiter üben</option><option value="sicher">Sicher</option><option value="unsicher">Noch unsicher</option></select>
 <label for="note">Notiz (optional)</label><textarea id="note" rows="2"></textarea><button id="save" type="button">Lernstand speichern</button>
 <p id="saveStatus" class="status" role="status"></p><ul id="progress"></ul></section>
 <section class="card wide"><h2>Beispiele zum Üben</h2><p>Was unterscheidet RAG von einem Modell, das nur aus seinem Gedächtnis antwortet? Wann würdest du ein Werkzeug statt einer Schätzung verwenden? Wie könntest du eine KI-Antwort überprüfen?</p><h2>Beispiel für Codex</h2><p>„Ich lerne für KI &amp; Data Science. Suche in meinen Unterlagen nach RAG und stelle mir zuerst eine Verständnisfrage. Gib mir Hinweise, bevor du die Lösung erklärst.“</p><p class="muted">Dieses Cockpit verwendet selbst kein KI-Modell. Es speichert und durchsucht Unterlagen lokal; Codex übernimmt die Unterhaltung.</p></section>
@@ -39,6 +41,16 @@ ul{padding-left:20px}li{margin:8px 0}.muted{color:#536b6d;font-size:.9rem}.resul
 <script>
 const $ = id => document.getElementById(id);
 const localServer = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') && location.protocol === 'http:';
+const subjectKey='sokratischer-tutor-faecher-v1';
+const subjects=JSON.parse(localStorage.getItem(subjectKey)||'["KI & Data Science"]');
+function drawSubjects(){const previous=$('subject').value;$('subject').replaceChildren();subjects.forEach(name=>{const o=document.createElement('option');o.value=name;o.textContent=name;$('subject').append(o)});if(subjects.includes(previous))$('subject').value=previous;}
+drawSubjects();
+$('addSubject').onclick=()=>{const name=$('newSubject').value.trim();if(!name)return;if(!subjects.includes(name))subjects.push(name);localStorage.setItem(subjectKey,JSON.stringify(subjects));drawSubjects();$('subject').value=name;$('newSubject').value='';};
+const themeKey='sokratischer-tutor-theme';
+function theme(){const dark=document.body.classList.toggle('dark',localStorage.getItem(themeKey)==='dark');$('theme').setAttribute('aria-pressed',String(dark));$('theme').textContent=dark?'☀ Hellmodus':'☾ Dunkelmodus';}
+$('theme').onclick=()=>{localStorage.setItem(themeKey,document.body.classList.contains('dark')?'light':'dark');theme();};theme();
+function makePrompt(mode){const q=$('question').value.trim();if(!q){$('promptStatus').textContent='Bitte gib zuerst deine Frage ein.';return;}$('promptStatus').textContent='';const request=mode==='hint'?'Ich habe es noch nicht verstanden. Gib mir einen kurzen Hinweis und stelle eine leichtere Gegenfrage.':mode==='exercise'?'Ich glaube, ich habe es verstanden. Stelle mir eine passende Übungsfrage und verrate die Lösung noch nicht.':'Stelle mir zuerst eine Verständnisfrage und gib mir danach gezielte Hinweise, bevor du die Lösung verrätst.';$('promptOutput').textContent=`Fach: ${$('subject').value}\nFrage: ${q}\nErklärstufe: ${$('difficulty').value}\n\n${request} Nutze, wenn verfügbar, meine im lokalen Tutor importierten Unterlagen und nenne die passende Quelle. Wenn keine Quelle vorliegt, kennzeichne das.`;}
+$('prepare').onclick=()=>makePrompt('start');$('hint').onclick=()=>makePrompt('hint');$('exercise').onclick=()=>makePrompt('exercise');$('copyPrompt').onclick=async()=>{const text=$('promptOutput').textContent;if(text==='Deine vorbereitete Anfrage erscheint hier.')return;try{await navigator.clipboard.writeText(text);$('promptStatus').textContent='Kopiert. Füge die Anfrage jetzt in Codex ein.';}catch{$('promptStatus').textContent='Bitte markiere und kopiere die Anfrage von Hand.';}};
 const browserKey = 'sokratischer-tutor-demo-v1';
 if (!localServer) {
   $('modeNotice').textContent = 'Online-Demo: Import und Suche laufen nur in diesem Browser. Für echte Codex-Gespräche öffne das Projekt lokal und importiere deine Unterlagen dort erneut. Browserdaten und lokaler Tutor werden nicht automatisch synchronisiert.';
@@ -104,7 +116,7 @@ $('search').onclick = async () => {
   } catch(e){$('searchStatus').textContent=e.message;}
 };
 $('save').onclick = async () => {
-  try {await api('/api/record',{topic:$('topic').value,status:$('level').value,note:$('note').value});$('saveStatus').textContent='Lernstand gespeichert.';$('topic').value='';$('note').value='';await refresh();}
+  try {if(!$('topic').value.trim()) throw new Error('Bitte ein Thema eingeben.');await api('/api/record',{topic:'['+$('subject').value+'] '+$('topic').value,status:$('level').value,note:$('note').value});$('saveStatus').textContent='Lernstand gespeichert.';$('topic').value='';$('note').value='';await refresh();}
   catch(e){$('saveStatus').textContent=e.message;}
 };
 refresh().catch(()=>{$('importStatus').textContent='Der lokale Tutor-Server ist nicht erreichbar. Bitte über die Startanleitung starten.';});
